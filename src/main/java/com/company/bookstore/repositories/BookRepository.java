@@ -1,4 +1,4 @@
 package com.company.bookstore.repositories;
 
-public class BookRepository {
+public interface BookRepository {
 }
