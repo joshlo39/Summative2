@@ -17,10 +17,11 @@ public class Book implements Serializable {
     private int id;
     private String isbn;
     private LocalDate publishDate;
-    @ManyToOne(fetch = FetchType.EAGER)
+
+    @Column(name = "author_id")
     private int authorId;
     private String title;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @Column(name = "publisher_id")
     private int publisherId;
     private double price;
 
