@@ -3,20 +3,28 @@ package com.company.bookstore.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "publisher")
-public class Publisher {
+public class Publisher implements Serializable {
     @Id
     @Column(name = "publisher_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "publisher_Id")
+    private List<Book> books;
     private String name;
     private String street;
     private String city;
     private String state;
+    @Column(name = "postal_code")
     private String postalCode;
     private String phone;
     private String email;
