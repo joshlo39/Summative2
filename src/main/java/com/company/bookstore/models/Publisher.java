@@ -3,31 +3,39 @@ package com.company.bookstore.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 @Table(name = "publisher")
-public class Publisher implements Serializable {
+public class Publisher {
+
     @Id
     @Column(name = "publisher_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "publisher_Id")
-    private List<Book> books;
     private String name;
     private String street;
     private String city;
     private String state;
+
     @Column(name = "postal_code")
-    private String postalCode;
+    private String postal_code;
     private String phone;
     private String email;
+
+    public Publisher(String name, String street, String city, String state, String postal_code, String phone, String email) {
+        this.name = name;
+        this.street = street;
+        this.city = city;
+        this.state = state;
+        this.postal_code = postal_code;
+        this.phone = phone;
+        this.email = email;
+    }
+
+    public Publisher() {
+    }
 
     public int getId() {
         return id;
@@ -69,12 +77,12 @@ public class Publisher implements Serializable {
         this.state = state;
     }
 
-    public String getPostalCode() {
-        return postalCode;
+    public String getpostal_code() {
+        return postal_code;
     }
 
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
+    public void setpostal_code(String postal_code) {
+        this.postal_code = postal_code;
     }
 
     public String getPhone() {
@@ -96,13 +104,14 @@ public class Publisher implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Publisher)) return false;
         Publisher publisher = (Publisher) o;
-        return id == publisher.id && Objects.equals(name, publisher.name) && Objects.equals(street, publisher.street) && Objects.equals(city, publisher.city) && Objects.equals(state, publisher.state) && Objects.equals(postalCode, publisher.postalCode) && Objects.equals(phone, publisher.phone) && Objects.equals(email, publisher.email);
+        return id == publisher.id && Objects.equals(name, publisher.name) && Objects.equals(street, publisher.street) && Objects.equals(city, publisher.city) && Objects.equals(state, publisher.state) && Objects.equals(postal_code, publisher.postal_code) && Objects.equals(phone, publisher.phone) && Objects.equals(email, publisher.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, street, city, state, postalCode, phone, email);
+        return Objects.hash(id, name, street, city, state, postal_code, phone, email);
     }
+
 }
