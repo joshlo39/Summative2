@@ -1,7 +1,7 @@
 package com.company.bookstore.controllers;
 
 import com.company.bookstore.models.Book;
-import com.company.bookstore.repositories.BookRepository;
+import com.company.bookstore.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -11,43 +11,60 @@ import java.util.Optional;
 
 @RestController
 public class BookController {
+
     @Autowired
-    BookRepository bookRepository;
+    private BookRepository bookRepository;
+
 
     //Create
     @PostMapping("/books")
-    @ResponseStatus(code = HttpStatus.CREATED)
-    public void addBook(@RequestBody  Book book) {
-        bookRepository.save(book);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Book createBook(@RequestBody Book book) {
+        return bookRepository.save(book);
     }
+
     //Read
+    @GetMapping("/books/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Book getBookById(@PathVariable int id) {
+        Optional<Book> resultBook = bookRepository.findById(id);
+        return resultBook.isPresent() ? resultBook.get() : null;
+    }
+
     @GetMapping("/books")
-    @ResponseStatus(code = HttpStatus.OK)
-    public List<Book> getAllBooks(){
+    @ResponseStatus(HttpStatus.OK)
+    public List<Book> getAllBooks() {
         return bookRepository.findAll();
     }
-    @GetMapping("/books/authorID/{authorId}")
-    @ResponseStatus(code = HttpStatus.OK)
-    public Book getBookByAuthorId(@PathVariable int authorId){
-        Optional<Book> returnVal = bookRepository.findById(authorId);
-        if (returnVal.isPresent()){
-            return returnVal.get();
-    }else {return null;}
-    }
+
     //Update
-    @PutMapping("/books")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void updateBook(@RequestBody Book book){
-        bookRepository.save(book);
+    @PutMapping("/books/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateBookById(@PathVariable int id) {
+        Optional<Book> resultBook = bookRepository.findById(id);
+        if (resultBook.isPresent()) {
+            Book returnVal = resultBook.get();
+            Book updatedBook = new Book(
+                   returnVal.getIsbn(), returnVal.getPublishDate(), returnVal.getAuthorId(),
+                    returnVal.getTitle(), returnVal.getPublisherId(), returnVal.getPrice()
+            );
+            updatedBook.setId(returnVal.getId());
+            bookRepository.save(updatedBook);
+        }
     }
+
     //Delete
-    @DeleteMapping("books/{id}")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void deleteBook(@PathVariable int id){
-        bookRepository.deleteById(id);
+    @DeleteMapping("/books/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteBookById(@PathVariable int id) {
+        Optional<Book> resultBook = bookRepository.findById(id);
+        if (resultBook.isPresent()) { bookRepository.deleteById(id); }
     }
 
-
-
+    @GetMapping("/books/author/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Book> searchBooksByAuthorId(@PathVariable int id) {
+        return bookRepository.findByAuthorId(id);
+    }
 
 }

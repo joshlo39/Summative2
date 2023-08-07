@@ -1,53 +1,68 @@
 package com.company.bookstore.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "book")
-public class Book {
-    @Id
-    @Column(name = "book_id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
-    private String isbn;
-    private LocalDate publish_date;
+public class Book implements Serializable {
 
-    @ManyToOne()
-    @JoinColumn(name = "author_id")
-    private Author authorId;
+    @Id
+    @Column(name="book_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    private String isbn;
+    @Column(name = "publish_date")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate publishDate;
+    @Column(name = "author_id")
+    private Integer authorId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", insertable = false, updatable = false)
+    private Author author;
 
     private String title;
+    @Column(name = "publisher_id")
+    private Integer publisherId;
 
-    @ManyToOne()
-    @JoinColumn(name = "publisher_id" )
-    private Publisher publisherId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "publisher_id", insertable = false, updatable = false)
+    private Publisher publisher;
 
     private BigDecimal price;
 
-    public int getId() {
-        return id;
-    }
-
-    public Book(String isbn, LocalDate publish_date, Author authorId, String title, Publisher publisherId, BigDecimal price) {
+    public Book(String isbn, LocalDate publishDate, Integer authorId, String title,
+                Integer publisherId, BigDecimal price) {
         this.isbn = isbn;
-        this.publish_date = publish_date;
+        this.publishDate = publishDate;
         this.authorId = authorId;
         this.title = title;
         this.publisherId = publisherId;
         this.price = price;
     }
 
-    public Book() {
+    public Book() {};
 
+    public Integer getId() {
+        return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -59,19 +74,19 @@ public class Book {
         this.isbn = isbn;
     }
 
-    public LocalDate getPublish_date() {
-        return publish_date;
+    public LocalDate getPublishDate() {
+        return publishDate;
     }
 
-    public void setPublish_date(LocalDate publish_date) {
-        this.publish_date = publish_date;
+    public void setPublishDate(LocalDate publishDate) {
+        this.publishDate = publishDate;
     }
 
-    public Author getAuthorId() {
+    public Integer getAuthorId() {
         return authorId;
     }
 
-    public void setAuthorId(Author authorId) {
+    public void setAuthorId(Integer authorId) {
         this.authorId = authorId;
     }
 
@@ -83,11 +98,11 @@ public class Book {
         this.title = title;
     }
 
-    public Publisher getPublisherId() {
+    public Integer getPublisherId() {
         return publisherId;
     }
 
-    public void setPublisherId(Publisher publisherId) {
+    public void setPublisherId(Integer publisherId) {
         this.publisherId = publisherId;
     }
 
@@ -104,11 +119,25 @@ public class Book {
         if (this == o) return true;
         if (!(o instanceof Book)) return false;
         Book book = (Book) o;
-        return Objects.equals(book.authorId, getAuthorId()) && Objects.equals(getPublisherId(), book.getPublisherId()) && Objects.equals(isbn, book.isbn) && Objects.equals(publish_date, book.publish_date) && Objects.equals(title, book.title) && Objects.equals(price, book.price);
+        return Objects.equals(id, book.id) && Objects.equals(isbn, book.isbn) && Objects.equals(publishDate, book.publishDate) && Objects.equals(authorId, book.authorId) && Objects.equals(title, book.title) && Objects.equals(publisherId, book.publisherId) && Objects.equals(price, book.price);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, isbn, publish_date, authorId, title, publisherId, price);
+        return Objects.hash(id, isbn, publishDate, authorId, title, publisherId, price);
     }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "id=" + id +
+                ", isbn='" + isbn + '\'' +
+                ", publishDate=" + publishDate +
+                ", authorId=" + authorId +
+                ", title='" + title + '\'' +
+                ", publisherId=" + publisherId +
+                ", price=" + price +
+                '}';
+    }
+
 }

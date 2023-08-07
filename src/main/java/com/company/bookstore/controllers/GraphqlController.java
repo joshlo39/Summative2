@@ -1,11 +1,10 @@
 package com.company.bookstore.controllers;
-
 import com.company.bookstore.models.Author;
 import com.company.bookstore.models.Book;
 import com.company.bookstore.models.Publisher;
-import com.company.bookstore.repositories.AuthorRepository;
-import com.company.bookstore.repositories.BookRepository;
-import com.company.bookstore.repositories.PublisherRepository;
+import com.company.bookstore.repository.AuthorRepository;
+import com.company.bookstore.repository.BookRepository;
+import com.company.bookstore.repository.PublisherRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -16,50 +15,48 @@ import java.util.Optional;
 
 @Controller
 public class GraphqlController {
+
     @Autowired
     PublisherRepository publisherRepository;
     @Autowired
-    BookRepository bookRepository;
-    @Autowired
     AuthorRepository authorRepository;
+    @Autowired
+    BookRepository bookRepository;
 
-    //--------------------Book--------------------
     @QueryMapping
-    public List<Book> books() {
-        return bookRepository.findAll();
+    public Publisher findPublisherById(@Argument int id){
+        Optional<Publisher> returnVal = publisherRepository.findById(id);
+        return returnVal.isPresent() ? returnVal.get(): null;
     }
-    //    find book by id
+
+    @QueryMapping
+    public Author findAuthorById(@Argument int id){
+        Optional<Author> returnVal = authorRepository.findById(id);
+        return returnVal.isPresent() ? returnVal.get(): null;
+    }
+
     @QueryMapping
     public Book findBookById(@Argument int id){
-        Optional<Book> book = bookRepository.findById(id);
-        if(book.isPresent()){
-            Book toReturn= book.get();
-            Author author = authorRepository.findById(toReturn.getAuthorId().getAuthor_id()).get();
-            Publisher publisher=publisherRepository.findById(toReturn.getPublisherId().getId()).get();
-            toReturn.setAuthorId(author);
-            toReturn.setPublisherId(publisher);
-            return toReturn;
-        }
-        return null;
-
-    }
-    //--------------------Author--------------------
-    @QueryMapping
-    public List<Author> authors() {
-        return authorRepository.findAll();
-    }
-    @QueryMapping
-    public Author findAuthorById(@Argument int id) {
-        Optional<Author> possibleAuthor =  authorRepository.findById(id);
-        if (possibleAuthor.isPresent()) {
-            return possibleAuthor.get();
-        } else {
+        Optional<Book> returnVal = bookRepository.findById(id);
+        if(returnVal.isPresent()){
+            return returnVal.get();
+        }else{
             return null;
         }
     }
+    @QueryMapping
+    public List<Book> books(){
+        return bookRepository.findAll();
+    }
 
-    //--------------------Publisher--------------------
+    @QueryMapping
+    public List<Author> authors(){
+        return authorRepository.findAll();
+    }
 
-
+    @QueryMapping
+    public List<Publisher> publishers(){
+        return publisherRepository.findAll();
+    }
 
 }
