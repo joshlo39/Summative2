@@ -36,21 +36,26 @@ public class AuthorController {
         return authorRepository.findAll();
     }
 
-    //Update
     @PutMapping("/authors/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateAuthorById(@PathVariable int id) {
+    public void updateAuthorById(@PathVariable int id, @RequestBody Author updatedDetails) {
         Optional<Author> resultAuthor = authorRepository.findById(id);
-        if (resultAuthor.isPresent()) {
-            Author returnVal = resultAuthor.get();
-            Author updatedAuthor = new Author(
-                   returnVal.getFirstName(), returnVal.getLastName(),
-                    returnVal.getStreet(), returnVal.getCity(), returnVal.getState(),
-                    returnVal.getPostalCode(), returnVal.getPhone(), returnVal.getEmail()
-            );
-            updatedAuthor.setId(returnVal.getId());
-            authorRepository.save(updatedAuthor);
-        }
+        resultAuthor.ifPresent(existingAuthor -> {
+            existingAuthor.setFirstName(getOrDefault(updatedDetails.getFirstName(), existingAuthor.getFirstName()));
+            existingAuthor.setLastName(getOrDefault(updatedDetails.getLastName(), existingAuthor.getLastName()));
+            existingAuthor.setStreet(getOrDefault(updatedDetails.getStreet(), existingAuthor.getStreet()));
+            existingAuthor.setCity(getOrDefault(updatedDetails.getCity(), existingAuthor.getCity()));
+            existingAuthor.setState(getOrDefault(updatedDetails.getState(), existingAuthor.getState()));
+            existingAuthor.setPostalCode(getOrDefault(updatedDetails.getPostalCode(), existingAuthor.getPostalCode()));
+            existingAuthor.setPhone(getOrDefault(updatedDetails.getPhone(), existingAuthor.getPhone()));
+            existingAuthor.setEmail(getOrDefault(updatedDetails.getEmail(), existingAuthor.getEmail()));
+
+            authorRepository.save(existingAuthor);
+        });
+    }
+
+    private <T> T getOrDefault(T newValue, T defaultValue) {
+        return newValue != null ? newValue : defaultValue;
     }
 
     //delete

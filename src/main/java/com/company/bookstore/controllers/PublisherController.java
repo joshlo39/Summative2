@@ -37,18 +37,23 @@ public class PublisherController {
 
     @PutMapping("/publishers/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updatePublisherById(@PathVariable int id) {
+    public void updatePublisherById(@PathVariable int id, @RequestBody Publisher updatedDetails) {
         Optional<Publisher> resultPublisher = publisherRepository.findById(id);
-        if (resultPublisher.isPresent()) {
-            Publisher returnVal = resultPublisher.get();
-            Publisher updatedPublisher = new Publisher(
-                    returnVal.getName(), returnVal.getStreet(),
-                    returnVal.getCity(), returnVal.getState(), returnVal.getPostalCode(),
-                    returnVal.getPhone(), returnVal.getEmail()
-            );
-            updatedPublisher.setId(returnVal.getId());
-            publisherRepository.save(updatedPublisher);
-        }
+        resultPublisher.ifPresent(existingPublisher -> {
+            existingPublisher.setName(getOrDefault(updatedDetails.getName(), existingPublisher.getName()));
+            existingPublisher.setStreet(getOrDefault(updatedDetails.getStreet(), existingPublisher.getStreet()));
+            existingPublisher.setCity(getOrDefault(updatedDetails.getCity(), existingPublisher.getCity()));
+            existingPublisher.setState(getOrDefault(updatedDetails.getState(), existingPublisher.getState()));
+            existingPublisher.setPostalCode(getOrDefault(updatedDetails.getPostalCode(), existingPublisher.getPostalCode()));
+            existingPublisher.setPhone(getOrDefault(updatedDetails.getPhone(), existingPublisher.getPhone()));
+            existingPublisher.setEmail(getOrDefault(updatedDetails.getEmail(), existingPublisher.getEmail()));
+
+            publisherRepository.save(existingPublisher);
+        });
+    }
+
+    private String getOrDefault(String newValue, String defaultValue) {
+        return newValue != null ? newValue : defaultValue;
     }
 
     @DeleteMapping("/publishers/{id}")

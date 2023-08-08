@@ -40,18 +40,24 @@ public class BookController {
     //Update
     @PutMapping("/books/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateBookById(@PathVariable int id) {
+    public void updateBookById(@PathVariable int id, @RequestBody Book updatedDetails) {
         Optional<Book> resultBook = bookRepository.findById(id);
-        if (resultBook.isPresent()) {
-            Book returnVal = resultBook.get();
-            Book updatedBook = new Book(
-                   returnVal.getIsbn(), returnVal.getPublishDate(), returnVal.getAuthorId(),
-                    returnVal.getTitle(), returnVal.getPublisherId(), returnVal.getPrice()
-            );
-            updatedBook.setId(returnVal.getId());
-            bookRepository.save(updatedBook);
-        }
+        resultBook.ifPresent(existingBook -> {
+            existingBook.setIsbn(getOrDefault(updatedDetails.getIsbn(), existingBook.getIsbn()));
+            existingBook.setPublishDate(getOrDefault(updatedDetails.getPublishDate(), existingBook.getPublishDate()));
+            existingBook.setAuthorId(getOrDefault(updatedDetails.getAuthorId(), existingBook.getAuthorId()));
+            existingBook.setTitle(getOrDefault(updatedDetails.getTitle(), existingBook.getTitle()));
+            existingBook.setPublisherId(getOrDefault(updatedDetails.getPublisherId(), existingBook.getPublisherId()));
+            existingBook.setPrice(getOrDefault(updatedDetails.getPrice(), existingBook.getPrice()));
+
+            bookRepository.save(existingBook);
+        });
     }
+
+    private <T> T getOrDefault(T newValue, T defaultValue) {
+        return newValue != null ? newValue : defaultValue;
+    }
+
 
     //Delete
     @DeleteMapping("/books/{id}")
