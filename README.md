@@ -1,4 +1,4 @@
-# Summative2 - Joshua Lopez, Abena Ofosu
+# Summative2 - Joshua Lopes, Abena Ofosu
 
 
 Summative 2 Video
